@@ -9,7 +9,6 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        /* Custom Scrollbar Styling */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
@@ -65,12 +64,18 @@
                 CINE<span class="text-white">WORLD</span>
             </div>
             
-            <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
                 <!-- Search Bar -->
-                <div class="relative w-full sm:w-72">
+                <div class="relative w-full sm:w-64">
                     <input type="text" id="searchBox" placeholder="චිත්‍රපට සොයන්න..." class="w-full bg-black/70 text-sm px-4 py-2 pl-10 rounded-full focus:outline-none focus:ring-2 focus:ring-red-600 border border-gray-700 backdrop-blur-md text-white placeholder-gray-400">
                     <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
                 </div>
+
+                <!-- Admin Panel Button (Owner ලොග් වුණාම විතරක් පෙනේ) -->
+                <button id="adminPanelBtn" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-xs px-4 py-2 rounded-full transition shadow-md hidden flex items-center gap-1.5 whitespace-nowrap">
+                    <i class="fa-solid fa-gear"></i> Admin Panel
+                </button>
+
                 <!-- Logout Button -->
                 <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-md whitespace-nowrap">
                     පිටවන්න
@@ -92,7 +97,7 @@
             </div>
         </section>
 
-        <!-- Main Movies Scroll Container -->
+        <!-- Main Movies Container -->
         <main class="px-6 -mt-12 relative z-20 pb-16 space-y-10 max-w-7xl mx-auto w-full">
             
             <!-- Top 10 Trending Section -->
@@ -117,7 +122,64 @@
         </main>
     </div>
 
+    <!-- ADMIN PANEL MODAL (අලුත් Film එකතු කිරීමේ Form එක) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl max-w-xl w-full space-y-4 shadow-2xl my-8">
+            <div class="flex justify-between items-center border-b border-gray-800 pb-3">
+                <h2 class="text-lg font-bold text-yellow-500 flex items-center gap-2">
+                    <i class="fa-solid fa-film"></i> අලුත් Film එකක් එකතු කරන්න
+                </h2>
+                <button id="closeAdminModal" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+
+            <form id="addMovieForm" class="space-y-3 text-sm">
+                <div>
+                    <label class="text-xs text-gray-400">Film Name (නම)</label>
+                    <input type="text" id="mTitle" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-gray-400">Year (වර්ෂය)</label>
+                        <input type="text" id="mYear" placeholder="2024" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-400">Category (වර්ගය)</label>
+                        <input type="text" id="mCategory" placeholder="Action / Sci-Fi" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Poster Image URL</label>
+                    <input type="url" id="mImage" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Description (විස්තරය)</label>
+                    <textarea id="mDesc" rows="3" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1"></textarea>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Cast (නළුවන්/නිළියන්)</label>
+                    <input type="text" id="mCast" placeholder="Actor 1, Actor 2" class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">YouTube Trailer URL</label>
+                    <input type="url" id="mYoutube" class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400">Telegram Download Link</label>
+                    <input type="url" id="mTelegram" class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
+                </div>
+                <div class="flex items-center gap-2 pt-2">
+                    <input type="checkbox" id="mTrending" class="w-4 h-4 accent-yellow-500 cursor-pointer">
+                    <label for="mTrending" class="text-xs text-gray-300 font-semibold cursor-pointer">Top 10 Trending වලට එකතු කරන්න</label>
+                </div>
+
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg transition mt-4">
+                    Film එක Save කරන්න
+                </button>
+            </form>
+        </div>
+    </div>
+
     <!-- Firebase Application Logic -->
     <script type="module" src="app.js"></script>
 </body>
-            </html>
+</html>
