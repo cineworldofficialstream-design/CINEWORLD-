@@ -3,49 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cineworld - Movie Stream</title>
+    <title>CINEWORLD - Watch & Download Movies</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-        h1 {
-            color: #e50914;
-        }
-        .movie-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        .movie-card {
-            background-color: #1f1f1f;
-            padding: 15px;
-            border-radius: 8px;
-            width: 200px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
-        .movie-card h3 {
-            font-size: 16px;
-            margin: 10px 0;
-        }
+        /* Custom Scrollbar Styling */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="bg-black text-white font-sans antialiased min-h-screen selection:bg-red-600 selection:text-white">
 
-    <h1>Cineworld Movies</h1>
-    <p>අපේ අලුත්ම චිත්‍රපට එකතුව</p>
+    <!-- LOGIN GUARD OVERLAY (ලොග් වී නැත්නම් පෙන්වන කොටස) -->
+    <div id="loginSection" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+        <div class="absolute top-6 left-6 text-2xl font-extrabold text-red-600 tracking-wider">
+            CINE<span class="text-white">WORLD</span>
+        </div>
+        
+        <div class="bg-gray-900/90 border border-gray-800 p-8 rounded-2xl max-w-md w-full text-center space-y-5 shadow-2xl backdrop-blur-md">
+            <div class="text-3xl font-extrabold text-red-600 tracking-wider">
+                CINE<span class="text-white">WORLD</span>
+            </div>
+            <p class="text-gray-300 text-sm">චිත්‍රපට නැරඹීමට සහ ඩවුන්ලෝඩ් කරගැනීමට කරුණාකර ඇතුල් වන්න.</p>
+            
+            <!-- Google Login Button -->
+            <button id="googleLoginBtn" class="w-full bg-white hover:bg-gray-200 text-gray-900 font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-3 shadow-lg">
+                <i class="fa-brands fa-google text-red-500 text-xl"></i> Google සමඟ ඇතුල් වන්න
+            </button>
 
-    <div class="movie-container" id="movieList">
-        <!-- Movies ටික මෙතනට Database එකෙන් Load වේවි -->
+            <div class="flex items-center my-4">
+                <div class="flex-grow border-t border-gray-800"></div>
+                <span class="px-3 text-gray-500 text-xs uppercase font-semibold">හෝ (OR)</span>
+                <div class="flex-grow border-t border-gray-800"></div>
+            </div>
+
+            <!-- Email & Password Form -->
+            <form id="emailLoginForm" class="space-y-4 text-left">
+                <div>
+                    <label class="text-xs text-gray-400 font-medium">Email ලිපිනය</label>
+                    <input type="email" id="emailInput" required class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600 mt-1 placeholder-gray-500" placeholder="yourname@gmail.com">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-medium">මුරපදය (Password)</label>
+                    <input type="password" id="passwordInput" required class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600 mt-1 placeholder-gray-500" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg text-sm">
+                    Email මඟින් ඇතුල් වන්න / Sign Up
+                </button>
+            </form>
+        </div>
     </div>
 
-    <!-- JavaScript ෆයිල් එක මෙතනින් සම්බන්ධ කර ඇත -->
+    <!-- MAIN DASHBOARD (ලොග් වූ පසු පෙනෙන කොටස) -->
+    <div id="dashboardSection" class="flex-1 flex flex-col hidden">
+        
+        <!-- Navbar Header -->
+        <header class="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/90 via-black/50 to-transparent px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="text-2xl font-extrabold text-red-600 tracking-wider">
+                CINE<span class="text-white">WORLD</span>
+            </div>
+            
+            <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
+                <!-- Search Bar -->
+                <div class="relative w-full sm:w-72">
+                    <input type="text" id="searchBox" placeholder="චිත්‍රපට සොයන්න..." class="w-full bg-black/70 text-sm px-4 py-2 pl-10 rounded-full focus:outline-none focus:ring-2 focus:ring-red-600 border border-gray-700 backdrop-blur-md text-white placeholder-gray-400">
+                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+                </div>
+                <!-- Logout Button -->
+                <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-md whitespace-nowrap">
+                    පිටවන්න
+                </button>
+            </div>
+        </header>
+
+        <!-- Netflix Style Hero Banner -->
+        <section id="heroBanner" class="relative h-[65vh] w-full flex items-end p-8 sm:p-16 bg-cover bg-center transition-all duration-500" style="background-image: linear-gradient(to top, #000, rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200');">
+            <div class="relative z-10 space-y-3 max-w-2xl">
+                <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-md uppercase tracking-widest shadow">Featured Movie</span>
+                <h1 id="heroTitle" class="text-3xl sm:text-5xl font-extrabold tracking-tight">CINEWORLD Cinema</h1>
+                <p id="heroDesc" class="text-gray-300 text-xs sm:text-sm line-clamp-2">නවතම උසස් තත්වයේ චිත්‍රපට නරඹන්න සහ එකම තැනකින් ඩවුන්ලෝඩ් කරගන්න.</p>
+                <div class="pt-2">
+                    <button id="heroWatchBtn" class="bg-white hover:bg-gray-200 text-black font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 transition shadow-lg text-sm">
+                        <i class="fa-solid fa-circle-info text-red-600"></i> විස්තර බලන්න
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Movies Scroll Container -->
+        <main class="px-6 -mt-12 relative z-20 pb-16 space-y-10 max-w-7xl mx-auto w-full">
+            
+            <!-- Top 10 Trending Section -->
+            <section class="space-y-4">
+                <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2 text-white tracking-wide">
+                    <i class="fa-solid fa-fire text-red-600"></i> Top 10 Trending Movies
+                </h2>
+                <div id="top10Container" class="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x">
+                    <!-- Javascript මඟින් Dynamic ලෝඩ් වේ -->
+                </div>
+            </section>
+
+            <!-- All Movies Section Grid -->
+            <section class="space-y-4">
+                <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2 text-white tracking-wide">
+                    <i class="fa-solid fa-film text-red-600"></i> සියලුම චිත්‍රපට (All Movies)
+                </h2>
+                <div id="allMoviesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+                    <!-- Javascript මඟින් Dynamic ලෝඩ් වේ -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Firebase Application Logic -->
     <script type="module" src="app.js"></script>
 </body>
-</html>
+            </html>
