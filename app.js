@@ -1,116 +1,93 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-import { 
-    getAuth, 
-    GoogleAuthProvider, 
-    signInWithPopup, 
-    signOut, 
-    onAuthStateChanged, 
-    signInWithEmailAndPassword, 
-    createUserWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { 
-    getFirestore, 
-    collection, 
-    getDocs, 
-    addDoc, 
-    deleteDoc, 
-    doc 
-} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyADNg0HkcGg7SisAq_Cjbfqqc9rH0Nv4-I",
     authDomain: "cineworld-901cb.firebaseapp.com",
     projectId: "cineworld-901cb",
     storageBucket: "cineworld-901cb.firebasestorage.app",
     messagingSenderId: "518573519989",
-    appId: "1:518573519989:web:9055e0d6efd4b9b7b2743c",
-    measurementId: "G-LP2CXFHMN0"
+    appId: "1:518573519989:web:9055e0d6efd4b9b7b2743c"
 };
 
-// Website Owner Admin Gmail Address
-const ADMIN_EMAIL = "cineworldofficialstream@gmail.com";
-
-// Initialize Firebase Services
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-// DOM Elements
+// Admin Email Validation
+const ADMIN_EMAIL = "cineworldofficialstream@gmail.com";
+
+// HTML Elements
 const loginSection = document.getElementById('loginSection');
 const dashboardSection = document.getElementById('dashboardSection');
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const searchBox = document.getElementById('searchBox');
+
+// Settings & Chat Elements
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettings = document.getElementById('closeSettings');
+const openChatBtn = document.getElementById('openChatBtn');
+const userEmailText = document.getElementById('userEmailText');
+const userInitial = document.getElementById('userInitial');
+
+// Admin Elements
+const adminSettingsSection = document.getElementById('adminSettingsSection');
 const adminPanelBtn = document.getElementById('adminPanelBtn');
 const adminModal = document.getElementById('adminModal');
 const closeAdminModal = document.getElementById('closeAdminModal');
 const addMovieForm = document.getElementById('addMovieForm');
 
-const emailLoginForm = document.getElementById('emailLoginForm');
-const emailInput = document.getElementById('emailInput');
-const passwordInput = document.getElementById('passwordInput');
-
 let allMoviesData = [];
 let currentUserEmail = "";
+let userFollowers = 0; // Followers count (Change this logic later in DB)
 
-// Helper: Escape strings to prevent XSS vulnerabilities
-function escapeHTML(str) {
-    return String(str || '').replace(/[&<>"']/g, function(m) {
-        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
-    });
+// Google Translation Logic
+window.googleTranslateElementInit = function() {
+    new google.translate.TranslateElement({pageLanguage: 'en', autoDisplay: false}, 'google_translate_element');
 }
 
-// 1. Google Authentication
+window.changeLanguage = function(langCode) {
+    const selectField = document.querySelector(".goog-te-combo");
+    if(selectField) {
+        selectField.value = langCode;
+        selectField.dispatchEvent(new Event('change'));
+        settingsModal.classList.add('hidden'); // භාෂාව තේරූ පසු Settings වැසේ
+    } else {
+        alert("Translation tool is still loading. Please try again in a few seconds.");
+    }
+}
+
+// Login
 googleLoginBtn.addEventListener('click', async () => {
-    try {
-        await signInWithPopup(auth, provider);
-    } catch (error) {
-        alert("Google Login දෝෂයක්: " + error.message);
-    }
+    try { await signInWithPopup(auth, provider); } 
+    catch (e) { alert("Login Error: " + e.message); }
 });
 
-// 2. Email Login & Signup
-emailLoginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = emailInput.value.trim();
-    const password = passwordInput.value.trim();
-
-    if (!email || !password) return;
-
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-        try {
-            await createUserWithEmailAndPassword(auth, email, password);
-        } catch (signUpError) {
-            alert("ලොගින් දෝෂයක් සිදු විය: " + signUpError.message);
-        }
-    }
-});
-
-// 3. Logout
+// Logout
 logoutBtn.addEventListener('click', async () => {
-    try {
-        await signOut(auth);
-    } catch (error) {
-        console.error("Logout Error:", error);
-    }
+    await signOut(auth);
+    settingsModal.classList.add('hidden');
 });
 
-// 4. Global Auth Observer
+// Auth State Observer
 onAuthStateChanged(auth, (user) => {
     if (user) {
-        currentUserEmail = user.email || "";
+        currentUserEmail = user.email;
+        userEmailText.innerText = currentUserEmail;
+        userInitial.innerText = currentUserEmail.charAt(0).toUpperCase();
+        
         loginSection.classList.add('hidden');
         dashboardSection.classList.remove('hidden');
 
-        // Admin Gmail එකෙන් ආවොත් Admin Panel Button එක පෙන්වීම
+        // අයිතිකරුට පමණක් Admin Dashboard Section එක පෙන්වීම
         if (currentUserEmail === ADMIN_EMAIL) {
-            adminPanelBtn.classList.remove('hidden');
+            adminSettingsSection.classList.remove('hidden');
         } else {
-            adminPanelBtn.classList.add('hidden');
+            adminSettingsSection.classList.add('hidden');
         }
 
         fetchMovies();
@@ -118,141 +95,56 @@ onAuthStateChanged(auth, (user) => {
         currentUserEmail = "";
         dashboardSection.classList.add('hidden');
         loginSection.classList.remove('hidden');
-        adminPanelBtn.classList.add('hidden');
     }
 });
 
-// 5. Fetch Movies from Firestore
-async function fetchMovies() {
-    try {
-        const querySnapshot = await getDocs(collection(db, "movies"));
-        allMoviesData = [];
-        querySnapshot.forEach((doc) => {
-            allMoviesData.push({ id: doc.id, ...doc.data() });
-        });
-        
-        displayMovies(allMoviesData);
-        setupHeroBanner(allMoviesData);
-    } catch (error) {
-        console.error("Error fetching movies:", error);
+// Settings Modal UI
+settingsBtn.addEventListener('click', () => {
+    settingsModal.classList.remove('hidden');
+    settingsModal.classList.add('flex');
+});
+closeSettings.addEventListener('click', () => {
+    settingsModal.classList.add('hidden');
+    settingsModal.classList.remove('flex');
+});
+
+// Chat Logic (Followers required)
+openChatBtn.addEventListener('click', () => {
+    if (userFollowers > 0) {
+        alert("Chat Box Opening..."); // Add Real Chat UI later
+    } else {
+        alert("Chat එක භාවිතා කිරීමට ඔබට අඩුම තරමේ එක් Follower කෙනෙක් හෝ සිටිය යුතුය!");
     }
-}
+});
 
-// 6. Setup Hero Banner
-function setupHeroBanner(movies) {
-    const featured = movies.find(m => m.isTrending) || movies[0];
-    if (featured) {
-        const banner = document.getElementById('heroBanner');
-        const title = document.getElementById('heroTitle');
-        const desc = document.getElementById('heroDesc');
-        const watchBtn = document.getElementById('heroWatchBtn');
+// Admin Modal UI
+adminPanelBtn.addEventListener('click', () => {
+    settingsModal.classList.add('hidden');
+    adminModal.classList.remove('hidden');
+});
+closeAdminModal.addEventListener('click', () => adminModal.classList.add('hidden'));
 
-        if (featured.imageUrl) {
-            banner.style.backgroundImage = `linear-gradient(to top, #000, rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('${escapeHTML(featured.imageUrl)}')`;
-        }
-        title.innerText = featured.title || "Featured Movie";
-        desc.innerText = featured.description || "";
-        watchBtn.onclick = () => window.goToDetail(featured.id);
-    }
-}
-
-// 7. Display Movies Grid
-function displayMovies(movies) {
-    const top10Container = document.getElementById('top10Container');
-    const allMoviesContainer = document.getElementById('allMoviesContainer');
-    
-    top10Container.innerHTML = "";
-    allMoviesContainer.innerHTML = "";
-
-    if (movies.length === 0) {
-        allMoviesContainer.innerHTML = "<p class='text-gray-400 col-span-full text-center py-8'>චිත්‍රපට හමු නොවීය.</p>";
-        return;
-    }
-
-    const isAdmin = currentUserEmail === ADMIN_EMAIL;
-    let rank = 1;
-
-    movies.forEach((movie) => {
-        const title = escapeHTML(movie.title);
-        const img = escapeHTML(movie.imageUrl);
-        const category = escapeHTML(movie.category || 'Movie');
-        const year = escapeHTML(movie.year || '');
-
-        const deleteButtonHTML = isAdmin ? `
-            <button onclick="event.stopPropagation(); window.deleteMovie('${movie.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full shadow-lg transition text-xs z-10" title="Delete Movie">
-                <i class="fa-solid fa-trash"></i>
-            </button>
-        ` : '';
-
-        // Top 10 Card
-        if (movie.isTrending && rank <= 10) {
-            top10Container.innerHTML += `
-                <div onclick="goToDetail('${movie.id}')" class="relative min-w-[180px] bg-gray-900 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition duration-300 flex-shrink-0 snap-start border border-gray-800">
-                    ${deleteButtonHTML}
-                    <div class="relative h-64">
-                        <img src="${img}" alt="${title}" class="w-full h-full object-cover">
-                        <span class="absolute top-2 left-2 bg-red-600 text-white font-extrabold text-sm w-7 h-7 rounded-full flex items-center justify-center shadow-lg">${rank}</span>
-                    </div>
-                    <div class="p-3">
-                        <h3 class="font-bold text-sm truncate">${title}</h3>
-                        <p class="text-xs text-gray-400 mt-0.5">${category}</p>
-                    </div>
-                </div>
-            `;
-            rank++;
-        }
-
-        // All Movies Grid Card
-        allMoviesContainer.innerHTML += `
-            <div onclick="goToDetail('${movie.id}')" class="relative bg-gray-900 rounded-xl overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition duration-300 border border-gray-800">
-                ${deleteButtonHTML}
-                <div class="h-60 bg-gray-950">
-                    <img src="${img}" alt="${title}" class="w-full h-full object-cover">
-                </div>
-                <div class="p-3">
-                    <h3 class="font-bold text-xs sm:text-sm truncate">${title}</h3>
-                    <p class="text-xs text-gray-400 mt-1">${year}</p>
-                </div>
-            </div>
-        `;
+// Search Function
+if(searchBox) {
+    searchBox.addEventListener('input', (e) => {
+        const txt = e.target.value.toLowerCase();
+        const filtered = allMoviesData.filter(m => m.title.toLowerCase().includes(txt) || m.category.toLowerCase().includes(txt));
+        displayMovies(filtered);
     });
 }
 
-// Redirect to Details
-window.goToDetail = function(movieId) {
-    window.location.href = `detail.html?id=${movieId}`;
-}
-
-// Delete Movie (Admin Only)
-window.deleteMovie = async function(movieId) {
-    if (confirm("ඔබට මෙම චිත්‍රපටය දත්ත ගබඩාවෙන් මකා දැමීමට අවශ්‍යද?")) {
-        try {
-            await deleteDoc(doc(db, "movies", movieId));
-            alert("චිත්‍රපටය සාර්ථකව මකා දමන ලදී!");
-            fetchMovies();
-        } catch (error) {
-            alert("මකා දැමීමට නොහැක: " + error.message);
-        }
-    }
-};
-
-// 8. Admin Modal UI Handlers
-adminPanelBtn.addEventListener('click', () => adminModal.classList.remove('hidden'));
-closeAdminModal.addEventListener('click', () => adminModal.classList.add('hidden'));
-
-// Add Movie Form Submission
+// Add Movie Database Logic
 addMovieForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-
     const newMovie = {
-        title: document.getElementById('mTitle').value.trim(),
-        year: document.getElementById('mYear').value.trim(),
-        category: document.getElementById('mCategory').value.trim(),
-        imageUrl: document.getElementById('mImage').value.trim(),
-        description: document.getElementById('mDesc').value.trim(),
-        cast: document.getElementById('mCast').value.trim(),
-        youtubeUrl: document.getElementById('mYoutube').value.trim(),
-        telegramLink: document.getElementById('mTelegram').value.trim(),
+        title: document.getElementById('mTitle').value,
+        year: document.getElementById('mYear').value,
+        category: document.getElementById('mCategory').value,
+        imageUrl: document.getElementById('mImage').value,
+        description: document.getElementById('mDesc').value,
+        cast: document.getElementById('mCast').value,
+        youtubeUrl: document.getElementById('mYoutube').value,
+        telegramLink: document.getElementById('mTelegram').value,
         isTrending: document.getElementById('mTrending').checked,
         createdAt: new Date().toISOString()
     };
@@ -263,17 +155,59 @@ addMovieForm.addEventListener('submit', async (e) => {
         addMovieForm.reset();
         adminModal.classList.add('hidden');
         fetchMovies();
-    } catch (error) {
-        alert("එකතු කිරීමට නොහැකි විය: " + error.message);
-    }
+    } catch (e) { alert("Error: " + e.message); }
 });
 
-// 9. Search Logic
-searchBox.addEventListener('input', (e) => {
-    const searchText = e.target.value.toLowerCase().trim();
-    const filtered = allMoviesData.filter(movie => 
-        (movie.title && movie.title.toLowerCase().includes(searchText)) ||
-        (movie.category && movie.category.toLowerCase().includes(searchText))
-    );
-    displayMovies(filtered);
-});
+// Delete Movie Database Logic
+window.deleteMovie = async function(id) {
+    if (confirm("මෙම චිත්‍රපටය මකා දැමීමට අවශ්‍යද?")) {
+        await deleteDoc(doc(db, "movies", id));
+        fetchMovies();
+    }
+}
+
+// Fetch & Display Movies Logic
+async function fetchMovies() {
+    const qs = await getDocs(collection(db, "movies"));
+    allMoviesData = [];
+    qs.forEach(d => allMoviesData.push({ id: d.id, ...d.data() }));
+    
+    // Set Hero Banner
+    const featured = allMoviesData.find(m => m.isTrending) || allMoviesData[0];
+    if (featured) {
+        document.getElementById('heroBanner').style.backgroundImage = `linear-gradient(to top, #121212, rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('${featured.imageUrl}')`;
+        document.getElementById('heroTitle').innerText = featured.title;
+        document.getElementById('heroDesc').innerText = featured.description;
+        document.getElementById('heroWatchBtn').onclick = () => window.location.href = `detail.html?id=${featured.id}`;
+    }
+    
+    displayMovies(allMoviesData);
+}
+
+function displayMovies(movies) {
+    const pref = document.getElementById('preferredMovies');
+    const trend = document.getElementById('trendingMovies');
+    pref.innerHTML = ""; trend.innerHTML = "";
+    
+    const isAdmin = currentUserEmail === ADMIN_EMAIL;
+
+    movies.forEach((m, idx) => {
+        const delBtn = isAdmin ? `<button onclick="event.stopPropagation(); deleteMovie('${m.id}')" class="absolute top-2 right-2 bg-red-600 p-1.5 rounded-full text-white text-xs z-10 hover:bg-red-700 shadow"><i class="fa-solid fa-trash"></i></button>` : '';
+        
+        const card = `
+            <div onclick="window.location.href='detail.html?id=${m.id}'" class="relative w-36 sm:w-44 flex-shrink-0 cursor-pointer snap-start group border border-gray-800 rounded-xl overflow-hidden bg-[#1a1a1a] shadow-lg">
+                ${delBtn}
+                <div class="h-48 sm:h-64 overflow-hidden">
+                    <img src="${m.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 opacity-90 group-hover:opacity-100">
+                </div>
+                <div class="p-3">
+                    <h3 class="text-xs sm:text-sm font-bold text-white truncate">${m.title}</h3>
+                    <p class="text-[10px] sm:text-xs text-gray-500 mt-1">${m.category} • ${m.year}</p>
+                </div>
+            </div>
+        `;
+
+        if (m.isTrending || idx % 2 !== 0) trend.innerHTML += card;
+        else pref.innerHTML += card;
+    });
+}
