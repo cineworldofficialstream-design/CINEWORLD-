@@ -1,1 +1,130 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CINEWORLD - Movie Details</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body { background-color: #121212; color: #e5e5e5; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen selection:bg-red-600 selection:text-white relative pb-10">
 
+    <!-- Navbar Overlay -->
+    <header class="absolute top-0 w-full z-50 p-4 flex justify-between items-center bg-gradient-to-b from-black/90 to-transparent">
+        <a href="index.html" class="text-white text-xl hover:text-gray-300 p-2 rounded-full bg-black/40 backdrop-blur-sm transition">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <div class="text-xl font-extrabold text-red-600 tracking-wider">CINEWORLD</div>
+    </header>
+
+    <!-- Trailer Header -->
+    <div class="w-full aspect-video bg-black relative shadow-2xl border-b border-gray-800" id="trailerContainer">
+        <!-- JS මඟින් Trailer එක මෙතැනට ලෝඩ් වේ -->
+        <img id="moviePoster" src="" class="w-full h-full object-cover opacity-60">
+    </div>
+
+    <!-- Movie Details -->
+    <main class="px-4 sm:px-8 py-6 max-w-4xl mx-auto space-y-6 -mt-2 relative z-20">
+        
+        <!-- Header Info -->
+        <div class="space-y-3">
+            <h1 id="movieTitle" class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight">Loading...</h1>
+            <div class="flex items-center gap-3 text-sm text-gray-400 font-medium">
+                <span id="movieYear">----</span>
+                <span class="bg-gray-800 px-1.5 py-0.5 rounded text-xs border border-gray-600 text-white">16+</span>
+                <span id="movieCategory">Category</span>
+            </div>
+        </div>
+
+        <!-- Download Button -->
+        <a id="telegramBtn" href="#" target="_blank" class="block w-full bg-red-600 text-white text-center py-3.5 rounded-lg font-bold text-lg hover:bg-red-700 transition shadow-lg shadow-red-600/20 hidden">
+            <i class="fa-brands fa-telegram mr-2"></i> Download / Watch Now
+        </a>
+        <p class="text-center text-xs text-gray-500" id="downloadSubtext">Endless entertainment. Free to download via Telegram.</p>
+
+        <!-- Synopsis Box -->
+        <div class="bg-[#1a1a1a] p-5 rounded-2xl space-y-3 border border-gray-800 shadow-xl">
+            <h3 class="text-white font-bold text-lg">Synopsis</h3>
+            <p id="movieDescription" class="text-sm text-gray-300 leading-relaxed text-justify">Description loading...</p>
+        </div>
+
+        <!-- More Details Box -->
+        <div class="bg-[#1a1a1a] p-5 rounded-2xl space-y-4 border border-gray-800 shadow-xl">
+            <h3 class="text-lg font-bold text-white border-b border-gray-800 pb-3">More Details</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="text-sm">
+                    <p class="text-gray-500 font-semibold mb-1">Starring (Cast)</p>
+                    <p class="text-gray-300" id="movieCast">Actors loading...</p>
+                </div>
+                <div class="text-sm">
+                    <p class="text-gray-500 font-semibold mb-1">Genres</p>
+                    <p class="text-gray-300" id="movieGenres">Genres loading...</p>
+                </div>
+                <div class="text-sm">
+                    <p class="text-gray-500 font-semibold mb-1">Offline Viewing</p>
+                    <p class="text-green-500 font-semibold"><i class="fa-solid fa-check-circle"></i> Available to download</p>
+                </div>
+                <div class="text-sm">
+                    <p class="text-gray-500 font-semibold mb-1">Audio & Subtitles</p>
+                    <p class="text-gray-300">Original Audio, Sinhala / English Subtitles</p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- detail.html Backend Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyADNg0HkcGg7SisAq_Cjbfqqc9rH0Nv4-I",
+            authDomain: "cineworld-901cb.firebaseapp.com",
+            projectId: "cineworld-901cb",
+            storageBucket: "cineworld-901cb.firebasestorage.app",
+            messagingSenderId: "518573519989",
+            appId: "1:518573519989:web:9055e0d6efd4b9b7b2743c"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const movieId = urlParams.get('id');
+
+        async function loadMovie() {
+            if (!movieId) return;
+            const docRef = doc(db, "movies", movieId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const m = docSnap.data();
+                document.title = `${m.title} - CINEWORLD`;
+                document.getElementById('movieTitle').innerText = m.title;
+                document.getElementById('movieYear').innerText = m.year;
+                document.getElementById('movieCategory').innerText = m.category;
+                document.getElementById('movieGenres').innerText = m.category;
+                document.getElementById('movieDescription').innerText = m.description;
+                document.getElementById('movieCast').innerText = m.cast || 'N/A';
+                document.getElementById('moviePoster').src = m.imageUrl;
+
+                if (m.telegramLink) {
+                    const btn = document.getElementById('telegramBtn');
+                    btn.href = m.telegramLink;
+                    btn.classList.remove('hidden');
+                }
+
+                if (m.youtubeUrl) {
+                    let embed = m.youtubeUrl.replace("watch?v=", "embed/").replace("youtu.be/", "www.youtube.com/embed/");
+                    document.getElementById('trailerContainer').innerHTML = `<iframe src="${embed}" class="w-full h-full" frameborder="0" allowfullscreen></iframe>`;
+                }
+            }
+        }
+        loadMovie();
+    </script>
+</body>
+</html>
