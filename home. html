@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cineworld - Netflix Cinematic Experience</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-black text-white font-sans antialiased min-h-screen selection:bg-red-600 selection:text-white">
+
+    <!-- 1. Google Login Overlay (ලොග් වී නැත්නම් මු 화면 එක සම්පූර්ණයෙන්ම වසාගෙන පෙන්වන Netflix Style Login එක) -->
+    <div id="loginSection" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
+        <div class="absolute top-6 left-6 text-2xl font-extrabold text-red-600 tracking-wider">CINE<span class="text-white">WORLD</span></div>
+        <div class="bg-gray-900/80 border border-gray-800 p-8 rounded-2xl max-w-md w-full text-center space-y-6 shadow-2xl backdrop-blur-md">
+            <div class="text-3xl font-extrabold text-red-600 tracking-wider">CINE<span class="text-white">WORLD</span></div>
+            <p class="text-gray-300 text-sm">චිත්‍රපට නැරඹීමට සහ ඩවුන්ලෝඩ් කරගැනීමට කරුණාකර ඔබේ Google ගිණුමෙන් ඇතුල් වන්න.</p>
+            <button id="googleLoginBtn" class="w-full bg-white hover:bg-gray-200 text-gray-900 font-bold py-3.5 px-4 rounded-xl transition flex items-center justify-center gap-3 shadow-lg">
+                <i class="fa-brands fa-google text-red-500 text-xl"></i> Google සමඟ ඇතුල් වන්න (Login)
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. Main Dashboard (ලොග් වූ පසු පෙනෙන Netflix Cinematic පිටුව) -->
+    <div id="dashboardSection" class="flex-1 flex flex-col hidden">
+        
+        <!-- Header (වම්පස ඉහළින් CINEWORLD නම සහ Search Bar) -->
+        <header class="absolute top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/80 via-black/40 to-transparent px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-8 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="text-2xl font-extrabold text-red-600 tracking-wider cursor-pointer">CINE<span class="text-white">WORLD</span></div>
+            </div>
+            
+            <div class="flex items-center gap-4 w-full sm:w-auto justify-end">
+                <!-- Search Bar -->
+                <div class="relative w-full sm:w-72">
+                    <input type="text" id="searchBox" placeholder="චිත්‍රපට නමක් සොයන්න..." class="w-full bg-black/60 text-sm px-4 py-2 pl-10 rounded-full focus:outline-none focus:ring-2 focus:ring-red-600 border border-gray-700 backdrop-blur-sm text-white placeholder-gray-400">
+                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+                </div>
+                <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-4 py-2 rounded-full transition shadow-md">
+                    පිටවන්න
+                </button>
+            </div>
+        </header>
+
+        <!-- Cinematic Hero Banner (Netflix Style Featured Movie) -->
+        <section id="heroBanner" class="relative h-[70vh] w-full flex items-end p-8 sm:p-16 bg-cover bg-center" style="background-image: linear-gradient(to top, #000, rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200');">
+            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent"></div>
+            <div class="relative z-10 space-y-4 max-w-2xl">
+                <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded uppercase tracking-widest shadow">Trending #1</span>
+                <h1 id="heroTitle" class="text-4xl sm:text-6xl font-extrabold tracking-tight">Cinematic Universe</h1>
+                <p id="heroDesc" class="text-gray-300 text-sm sm:text-base line-clamp-2">ඔබේ මනස්කාන්ත සිනමා අත්දැකීම වෙනුවෙන් අලුත්ම චිත්‍රපට එකතුවක් දැන් නරඹන්න.</p>
+                <div class="flex gap-4 pt-2">
+                    <button id="heroWatchBtn" class="bg-white hover:bg-gray-200 text-black font-bold px-6 py-3 rounded-lg flex items-center gap-2 transition shadow-lg">
+                        <i class="fa-solid fa-play text-red-600"></i> විස්තර බලන්න
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Scrollable Content -->
+        <main class="px-6 -mt-16 relative z-20 pb-16 space-y-12 max-w-7xl mx-auto w-full">
+            
+            <!-- Top 10 Trending Section (Horizontal Slow Scroll) -->
+            <section class="space-y-4">
+                <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2 text-white">
+                    <i class="fa-solid fa-fire text-red-600"></i> Top 10 Trending Movies
+                </h2>
+                <div id="top10Container" class="flex overflow-x-auto gap-4 pb-4 scrollbar-none snap-x">
+                    <!-- Firebase එකෙන් ලෝඩ් වේ -->
+                </div>
+            </section>
+
+            <!-- All Movies Vertical Scroll Grid -->
+            <section class="space-y-4">
+                <h2 class="text-xl sm:text-2xl font-bold flex items-center gap-2 text-white">
+                    <i class="fa-solid fa-film text-red-600"></i> සියලුම චිත්‍රපට (All Movies)
+                </h2>
+                <div id="allMoviesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <!-- Firebase එකෙන් ලෝඩ් වේ -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript ෆයිල් එක සම්බන්ධ කිරීම -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
