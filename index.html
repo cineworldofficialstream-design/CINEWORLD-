@@ -3,183 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Meta Tags (Google Search හි ඉහළට ඒමට) -->
     <title>CINEWORLD - Watch & Download Movies</title>
-    <!-- Tailwind CSS -->
+    <meta name="description" content="CINEWORLD - නවතම සිංහල, ඉංග්‍රීසි, හින්දි සහ කොරියානු චිත්‍රපට නරඹන්න සහ ඩවුන්ලෝඩ් කරගන්න.">
+    <meta name="keywords" content="cineworld, cineworld lk, download movies sri lanka, watch movies online, sinhala subtitles">
+    <meta name="author" content="Cineworld">
+
+    <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #121212; color: #e5e5e5; }
+        /* Google Translate Top Bar Hide කිරීම */
+        .goog-te-banner-frame {display:none !important;}
+        body {top: 0px !important;}
     </style>
 </head>
-<body class="bg-black text-white font-sans antialiased min-h-screen selection:bg-red-600 selection:text-white">
+<body class="font-sans antialiased min-h-screen selection:bg-red-600 selection:text-white relative">
 
-    <!-- LOGIN GUARD OVERLAY (ලොග් වී නැත්නම් පෙන්වන කොටස) -->
+    <!-- Google Translate Script (සැඟවුණු) -->
+    <div id="google_translate_element" class="hidden"></div>
+    <script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <!-- LOGIN SECTION -->
     <div id="loginSection" class="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4">
-        <div class="absolute top-6 left-6 text-2xl font-extrabold text-red-600 tracking-wider">
-            CINE<span class="text-white">WORLD</span>
-        </div>
-        
-        <div class="bg-gray-900/90 border border-gray-800 p-8 rounded-2xl max-w-md w-full text-center space-y-5 shadow-2xl backdrop-blur-md">
-            <div class="text-3xl font-extrabold text-red-600 tracking-wider">
+        <div class="bg-[#1a1a1a] border border-gray-800 p-8 rounded-2xl max-w-md w-full text-center space-y-5 shadow-2xl backdrop-blur-md">
+            <div class="text-4xl font-extrabold text-red-600 tracking-wider">
                 CINE<span class="text-white">WORLD</span>
             </div>
-            <p class="text-gray-300 text-sm">චිත්‍රපට නැරඹීමට සහ ඩවුන්ලෝඩ් කරගැනීමට කරුණාකර ඇතුල් වන්න.</p>
-            
-            <!-- Google Login Button -->
-            <button id="googleLoginBtn" class="w-full bg-white hover:bg-gray-200 text-gray-900 font-bold py-3 px-4 rounded-xl transition flex items-center justify-center gap-3 shadow-lg">
+            <p class="text-gray-400 text-sm">චිත්‍රපට නැරඹීමට ඇතුල් වන්න.</p>
+            <button id="googleLoginBtn" class="w-full bg-white hover:bg-gray-200 text-black font-bold py-3 rounded-xl transition flex items-center justify-center gap-3 shadow-lg">
                 <i class="fa-brands fa-google text-red-500 text-xl"></i> Google සමඟ ඇතුල් වන්න
             </button>
-
-            <div class="flex items-center my-4">
-                <div class="flex-grow border-t border-gray-800"></div>
-                <span class="px-3 text-gray-500 text-xs uppercase font-semibold">හෝ (OR)</span>
-                <div class="flex-grow border-t border-gray-800"></div>
-            </div>
-
-            <!-- Email & Password Form -->
-            <form id="emailLoginForm" class="space-y-4 text-left">
-                <div>
-                    <label class="text-xs text-gray-400 font-medium">Email ලිපිනය</label>
-                    <input type="email" id="emailInput" required class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600 mt-1 placeholder-gray-500" placeholder="yourname@gmail.com">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400 font-medium">මුරපදය (Password)</label>
-                    <input type="password" id="passwordInput" required class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-2 focus:ring-red-600 mt-1 placeholder-gray-500" placeholder="••••••••">
-                </div>
-                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl transition shadow-lg text-sm">
-                    Email මඟින් ඇතුල් වන්න / Sign Up
-                </button>
-            </form>
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD (ලොග් වූ පසු පෙනෙන කොටස) -->
-    <div id="dashboardSection" class="flex-1 flex flex-col hidden">
-        
-        <!-- Navbar Header -->
-        <header class="fixed top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/90 via-black/50 to-transparent px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardSection" class="hidden">
+        <!-- Navbar -->
+        <header class="fixed top-0 w-full z-40 bg-gradient-to-b from-black/95 to-transparent px-6 py-4 flex justify-between items-center transition-all">
             <div class="text-2xl font-extrabold text-red-600 tracking-wider">
                 CINE<span class="text-white">WORLD</span>
             </div>
-            
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-end">
-                <!-- Search Bar -->
-                <div class="relative w-full sm:w-64">
-                    <input type="text" id="searchBox" placeholder="චිත්‍රපට සොයන්න..." class="w-full bg-black/70 text-sm px-4 py-2 pl-10 rounded-full focus:outline-none focus:ring-2 focus:ring-red-600 border border-gray-700 backdrop-blur-md text-white placeholder-gray-400">
-                    <i class="fa-solid fa-search absolute left-3.5 top-3 text-gray-400 text-sm"></i>
+            <div class="flex items-center gap-5">
+                <div class="relative hidden sm:block">
+                    <input type="text" id="searchBox" placeholder="Search movies..." class="bg-black/50 border border-gray-700 text-white rounded-full px-4 py-1.5 text-sm focus:outline-none focus:border-red-600 w-48">
+                    <i class="fa-solid fa-search absolute right-3 top-2 text-gray-400 text-sm"></i>
                 </div>
-
-                <!-- Admin Panel Button (Owner ලොග් වුණාම විතරක් පෙනේ) -->
-                <button id="adminPanelBtn" class="bg-yellow-500 hover:bg-yellow-600 text-black font-bold text-xs px-4 py-2 rounded-full transition shadow-md hidden flex items-center gap-1.5 whitespace-nowrap">
-                    <i class="fa-solid fa-gear"></i> Admin Panel
+                <button id="settingsBtn" class="text-xl hover:text-white text-gray-400 transition">
+                    <i class="fa-solid fa-gear"></i>
                 </button>
-
-                <!-- Logout Button -->
-                <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-md whitespace-nowrap">
-                    පිටවන්න
-                </button>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/0b/Netflix-avatar.png" class="w-8 h-8 rounded cursor-pointer">
             </div>
         </header>
 
-        <!-- Netflix Style Hero Banner -->
-        <section id="heroBanner" class="relative h-[65vh] w-full flex items-end p-8 sm:p-16 bg-cover bg-center transition-all duration-500" style="background-image: linear-gradient(to top, #000, rgba(0,0,0,0.3), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200');">
-            <div class="relative z-10 space-y-3 max-w-2xl">
-                <span class="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-md uppercase tracking-widest shadow">Featured Movie</span>
-                <h1 id="heroTitle" class="text-3xl sm:text-5xl font-extrabold tracking-tight">CINEWORLD Cinema</h1>
-                <p id="heroDesc" class="text-gray-300 text-xs sm:text-sm line-clamp-2">නවතම උසස් තත්වයේ චිත්‍රපට නරඹන්න සහ එකම තැනකින් ඩවුන්ලෝඩ් කරගන්න.</p>
-                <div class="pt-2">
-                    <button id="heroWatchBtn" class="bg-white hover:bg-gray-200 text-black font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 transition shadow-lg text-sm">
-                        <i class="fa-solid fa-circle-info text-red-600"></i> විස්තර බලන්න
-                    </button>
+        <!-- Main Content -->
+        <main class="pb-20">
+            <!-- Hero Trailer Section -->
+            <section id="heroBanner" class="relative w-full h-[60vh] sm:h-[80vh] bg-black transition-all duration-500" style="background-image: linear-gradient(to top, #121212, rgba(0,0,0,0.2), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1200'); background-size: cover; background-position: center;">
+                <div class="absolute bottom-10 left-6 space-y-4 max-w-xl z-10">
+                    <h1 id="heroTitle" class="text-4xl sm:text-5xl font-extrabold text-white">CINEWORLD</h1>
+                    <p id="heroDesc" class="text-gray-300 text-sm line-clamp-3">හොඳම චිත්‍රපට එකම තැනකින්...</p>
+                    <div class="flex gap-3 pt-2">
+                        <button id="heroWatchBtn" class="bg-white text-black px-6 py-2.5 rounded font-bold hover:bg-gray-200 flex items-center gap-2 shadow-lg">
+                            <i class="fa-solid fa-play"></i> Play Now
+                        </button>
+                    </div>
                 </div>
+            </section>
+
+            <div class="px-6 -mt-8 relative z-20 space-y-10 max-w-7xl mx-auto">
+                <!-- User Preferred (For You) -->
+                <section>
+                    <h2 class="text-lg font-semibold text-white mb-3 tracking-wide">ඔබ ප්‍රිය කරන චිත්‍රපට (For You)</h2>
+                    <div id="preferredMovies" class="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x">
+                        <!-- JS Dynamic Load -->
+                    </div>
+                </section>
+
+                <!-- Trending (Top 10 Searched) -->
+                <section>
+                    <h2 class="text-lg font-semibold text-white mb-3 tracking-wide">වැඩිපුරම සෙවූ චිත්‍රපට 10 (Trending Now)</h2>
+                    <div id="trendingMovies" class="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x">
+                        <!-- JS Dynamic Load -->
+                    </div>
+                </section>
             </div>
-        </section>
-
-        <!-- Main Movies Container -->
-        <main class="px-6 -mt-12 relative z-20 pb-16 space-y-10 max-w-7xl mx-auto w-full">
-            
-            <!-- Top 10 Trending Section -->
-            <section class="space-y-4">
-                <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2 text-white tracking-wide">
-                    <i class="fa-solid fa-fire text-red-600"></i> Top 10 Trending Movies
-                </h2>
-                <div id="top10Container" class="flex overflow-x-auto gap-4 pb-4 no-scrollbar snap-x">
-                    <!-- Javascript මඟින් Dynamic ලෝඩ් වේ -->
-                </div>
-            </section>
-
-            <!-- All Movies Section Grid -->
-            <section class="space-y-4">
-                <h2 class="text-lg sm:text-xl font-bold flex items-center gap-2 text-white tracking-wide">
-                    <i class="fa-solid fa-film text-red-600"></i> සියලුම චිත්‍රපට (All Movies)
-                </h2>
-                <div id="allMoviesContainer" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-                    <!-- Javascript මඟින් Dynamic ලෝඩ් වේ -->
-                </div>
-            </section>
         </main>
     </div>
 
-    <!-- ADMIN PANEL MODAL (අලුත් Film එකතු කිරීමේ Form එක) -->
-    <div id="adminModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl max-w-xl w-full space-y-4 shadow-2xl my-8">
+    <!-- SETTINGS MODAL -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/95 z-[60] hidden flex-col items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
+        <button id="closeSettings" class="absolute top-6 right-6 text-3xl text-gray-400 hover:text-white">&times;</button>
+        
+        <div class="bg-[#1a1a1a] w-full max-w-md rounded-2xl p-6 border border-gray-800 space-y-6 my-8 shadow-2xl">
+            <h2 class="text-2xl font-bold text-white text-center border-b border-gray-700 pb-4">Settings</h2>
+            
+            <!-- 1. Profile & Chat -->
+            <div class="space-y-3">
+                <h3 class="text-gray-400 text-sm font-semibold uppercase">Profile & Community</h3>
+                <div class="flex items-center justify-between bg-black/40 p-4 rounded-xl border border-gray-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center font-bold text-white shadow-lg" id="userInitial">U</div>
+                        <div>
+                            <p class="text-white font-medium text-sm" id="userEmailText">Loading...</p>
+                            <p class="text-xs text-gray-500" id="followerCountText">Followers: 0</p>
+                        </div>
+                    </div>
+                    <button id="openChatBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition shadow">
+                        <i class="fa-solid fa-message"></i> Chat
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Language -->
+            <div class="space-y-3">
+                <h3 class="text-gray-400 text-sm font-semibold uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-globe text-blue-500"></i> භාෂාව (Language)
+                </h3>
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <button onclick="changeLanguage('en')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇺🇸</span> English</button>
+                    <button onclick="changeLanguage('ko')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇰🇷</span> Korean</button>
+                    <button onclick="changeLanguage('ja')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇯🇵</span> Japan</button>
+                    <button onclick="changeLanguage('zh-CN')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇨🇳</span> China</button>
+                    <button onclick="changeLanguage('si')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇱🇰</span> Sinhala</button>
+                    <button onclick="changeLanguage('de')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇩🇪</span> German</button>
+                    <button onclick="changeLanguage('hi')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇮🇳</span> Hindi</button>
+                    <button onclick="changeLanguage('ta')" class="bg-gray-800 hover:bg-gray-700 p-2.5 rounded-xl flex items-center gap-3 transition border border-gray-700"><span class="text-xl">🇮🇳</span> Tamil</button>
+                </div>
+            </div>
+
+            <!-- 3. Social Media Links -->
+            <div class="space-y-3">
+                <h3 class="text-gray-400 text-sm font-semibold uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-link text-red-500"></i> අප හා සම්බන්ධ වන්න
+                </h3>
+                <div class="flex justify-center gap-5 text-2xl bg-black/40 p-4 rounded-xl border border-gray-800">
+                    <a href="#" class="text-[#25D366] hover:scale-110 transition"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="#" class="text-white hover:scale-110 transition"><i class="fa-brands fa-tiktok"></i></a>
+                    <a href="#" class="text-[#1877F2] hover:scale-110 transition"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" class="text-[#FF0000] hover:scale-110 transition"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="text-gray-300 hover:scale-110 transition"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="text-[#0088cc] hover:scale-110 transition"><i class="fa-brands fa-telegram"></i></a>
+                </div>
+            </div>
+
+            <!-- Logout Button -->
+            <button id="logoutBtn" class="w-full bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white font-bold py-2.5 rounded-xl transition border border-red-600/30">
+                පිටවන්න (Logout)
+            </button>
+
+            <!-- 4. Admin Panel (Owner Only) -->
+            <div id="adminSettingsSection" class="hidden space-y-3 mt-4 border-t border-gray-800 pt-4">
+                <h3 class="text-yellow-500 text-xs font-semibold uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-lock"></i> Owner Dashboard
+                </h3>
+                <button id="adminPanelBtn" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-xl transition flex justify-center items-center gap-2 shadow-lg text-sm">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> Add Movies / Manage
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN MODAL (අලුත් Film එකතු කිරීමේ Form එක) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/95 z-[70] hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-[#1a1a1a] border border-gray-800 p-6 rounded-2xl max-w-xl w-full space-y-4 shadow-2xl my-8">
             <div class="flex justify-between items-center border-b border-gray-800 pb-3">
                 <h2 class="text-lg font-bold text-yellow-500 flex items-center gap-2">
-                    <i class="fa-solid fa-film"></i> අලුත් Film එකක් එකතු කරන්න
+                    <i class="fa-solid fa-film"></i> Upload New Movie
                 </h2>
                 <button id="closeAdminModal" class="text-gray-400 hover:text-white text-xl font-bold">&times;</button>
             </div>
-
             <form id="addMovieForm" class="space-y-3 text-sm">
-                <div>
-                    <label class="text-xs text-gray-400">Film Name (නම)</label>
-                    <input type="text" id="mTitle" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
-                </div>
+                <div><label class="text-xs text-gray-400">Film Name</label><input type="text" id="mTitle" required class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-xs text-gray-400">Year (වර්ෂය)</label>
-                        <input type="text" id="mYear" placeholder="2024" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-400">Category (වර්ගය)</label>
-                        <input type="text" id="mCategory" placeholder="Action / Sci-Fi" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
-                    </div>
+                    <div><label class="text-xs text-gray-400">Year</label><input type="text" id="mYear" required class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></div>
+                    <div><label class="text-xs text-gray-400">Category</label><input type="text" id="mCategory" required class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></div>
                 </div>
-                <div>
-                    <label class="text-xs text-gray-400">Poster Image URL</label>
-                    <input type="url" id="mImage" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">Description (විස්තරය)</label>
-                    <textarea id="mDesc" rows="3" required class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1"></textarea>
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">Cast (නළුවන්/නිළියන්)</label>
-                    <input type="text" id="mCast" placeholder="Actor 1, Actor 2" class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">YouTube Trailer URL</label>
-                    <input type="url" id="mYoutube" class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
-                </div>
-                <div>
-                    <label class="text-xs text-gray-400">Telegram Download Link</label>
-                    <input type="url" id="mTelegram" class="w-full bg-black/60 border border-gray-700 rounded-lg p-2.5 text-white focus:outline-none focus:border-yellow-500 mt-1">
-                </div>
+                <div><label class="text-xs text-gray-400">Poster URL</label><input type="url" id="mImage" required class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></div>
+                <div><label class="text-xs text-gray-400">Description</label><textarea id="mDesc" rows="2" required class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></textarea></div>
+                <div><label class="text-xs text-gray-400">Cast</label><input type="text" id="mCast" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></div>
+                <div><label class="text-xs text-gray-400">YouTube Trailer</label><input type="url" id="mYoutube" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></div>
+                <div><label class="text-xs text-gray-400">Telegram Link (Download)</label><input type="url" id="mTelegram" class="w-full bg-black/50 border border-gray-700 rounded-lg p-2 text-white mt-1"></div>
                 <div class="flex items-center gap-2 pt-2">
-                    <input type="checkbox" id="mTrending" class="w-4 h-4 accent-yellow-500 cursor-pointer">
-                    <label for="mTrending" class="text-xs text-gray-300 font-semibold cursor-pointer">Top 10 Trending වලට එකතු කරන්න</label>
+                    <input type="checkbox" id="mTrending" class="w-4 h-4 accent-yellow-500">
+                    <label for="mTrending" class="text-xs text-gray-300">Trending Now හි පෙන්වන්න</label>
                 </div>
-
-                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg transition mt-4">
-                    Film එක Save කරන්න
-                </button>
+                <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-3 rounded-lg transition mt-4">Save Movie</button>
             </form>
         </div>
     </div>
 
-    <!-- Firebase Application Logic -->
+    <!-- Firebase System -->
     <script type="module" src="app.js"></script>
 </body>
 </html>
