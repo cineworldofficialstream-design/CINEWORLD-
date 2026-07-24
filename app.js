@@ -8,9 +8,16 @@ import {
     signInWithEmailAndPassword, 
     createUserWithEmailAndPassword 
 } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { 
+    getFirestore, 
+    collection, 
+    getDocs, 
+    addDoc, 
+    deleteDoc, 
+    doc 
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
-// Firebase Configuration
+// Firebase Config
 const firebaseConfig = {
     apiKey: "AIzaSyADNg0HkcGg7SisAq_Cjbfqqc9rH0Nv4-I",
     authDomain: "cineworld-901cb.firebaseapp.com",
@@ -21,7 +28,10 @@ const firebaseConfig = {
     measurementId: "G-LP2CXFHMN0"
 };
 
-// Initialize Firebase
+// Website Owner Admin Gmail Address
+const ADMIN_EMAIL = "cineworldofficialstream@gmail.com";
+
+// Initialize Firebase Services
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -33,12 +43,17 @@ const dashboardSection = document.getElementById('dashboardSection');
 const googleLoginBtn = document.getElementById('googleLoginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
 const searchBox = document.getElementById('searchBox');
+const adminPanelBtn = document.getElementById('adminPanelBtn');
+const adminModal = document.getElementById('adminModal');
+const closeAdminModal = document.getElementById('closeAdminModal');
+const addMovieForm = document.getElementById('addMovieForm');
 
 const emailLoginForm = document.getElementById('emailLoginForm');
 const emailInput = document.getElementById('emailInput');
 const passwordInput = document.getElementById('passwordInput');
 
 let allMoviesData = [];
+let currentUserEmail = "";
 
 // Helper: Escape strings to prevent XSS vulnerabilities
 function escapeHTML(str) {
@@ -56,7 +71,7 @@ googleLoginBtn.addEventListener('click', async () => {
     }
 });
 
-// 2. Email & Password Auth (SignIn / SignUp)
+// 2. Email Login & Signup
 emailLoginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = emailInput.value.trim();
@@ -67,7 +82,6 @@ emailLoginForm.addEventListener('submit', async (e) => {
     try {
         await signInWithEmailAndPassword(auth, email, password);
     } catch (error) {
-        // If user doesn't exist, automatically sign up
         try {
             await createUserWithEmailAndPassword(auth, email, password);
         } catch (signUpError) {
@@ -76,7 +90,7 @@ emailLoginForm.addEventListener('submit', async (e) => {
     }
 });
 
-// 3. Sign Out Functionality
+// 3. Logout
 logoutBtn.addEventListener('click', async () => {
     try {
         await signOut(auth);
@@ -85,19 +99,30 @@ logoutBtn.addEventListener('click', async () => {
     }
 });
 
-// 4. Global Auth Observer (Auth Guard)
+// 4. Global Auth Observer
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        currentUserEmail = user.email || "";
         loginSection.classList.add('hidden');
         dashboardSection.classList.remove('hidden');
+
+        // Admin Gmail එකෙන් ආවොත් Admin Panel Button එක පෙන්වීම
+        if (currentUserEmail === ADMIN_EMAIL) {
+            adminPanelBtn.classList.remove('hidden');
+        } else {
+            adminPanelBtn.classList.add('hidden');
+        }
+
         fetchMovies();
     } else {
+        currentUserEmail = "";
         dashboardSection.classList.add('hidden');
         loginSection.classList.remove('hidden');
+        adminPanelBtn.classList.add('hidden');
     }
 });
 
-// 5. Fetch Movies from Firestore Database
+// 5. Fetch Movies from Firestore
 async function fetchMovies() {
     try {
         const querySnapshot = await getDocs(collection(db, "movies"));
@@ -113,7 +138,7 @@ async function fetchMovies() {
     }
 }
 
-// 6. Setup Hero Banner with the First Trending Movie
+// 6. Setup Hero Banner
 function setupHeroBanner(movies) {
     const featured = movies.find(m => m.isTrending) || movies[0];
     if (featured) {
@@ -131,7 +156,7 @@ function setupHeroBanner(movies) {
     }
 }
 
-// 7. Render Movies to Top 10 and Grid Container
+// 7. Display Movies Grid
 function displayMovies(movies) {
     const top10Container = document.getElementById('top10Container');
     const allMoviesContainer = document.getElementById('allMoviesContainer');
@@ -144,17 +169,26 @@ function displayMovies(movies) {
         return;
     }
 
+    const isAdmin = currentUserEmail === ADMIN_EMAIL;
     let rank = 1;
+
     movies.forEach((movie) => {
         const title = escapeHTML(movie.title);
         const img = escapeHTML(movie.imageUrl);
         const category = escapeHTML(movie.category || 'Movie');
         const year = escapeHTML(movie.year || '');
 
-        // Top 10 Horizontal Scroll Card
+        const deleteButtonHTML = isAdmin ? `
+            <button onclick="event.stopPropagation(); window.deleteMovie('${movie.id}')" class="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white p-1.5 rounded-full shadow-lg transition text-xs z-10" title="Delete Movie">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+        ` : '';
+
+        // Top 10 Card
         if (movie.isTrending && rank <= 10) {
             top10Container.innerHTML += `
-                <div onclick="goToDetail('${movie.id}')" class="min-w-[180px] bg-gray-900 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition duration-300 flex-shrink-0 snap-start border border-gray-800">
+                <div onclick="goToDetail('${movie.id}')" class="relative min-w-[180px] bg-gray-900 rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-105 transition duration-300 flex-shrink-0 snap-start border border-gray-800">
+                    ${deleteButtonHTML}
                     <div class="relative h-64">
                         <img src="${img}" alt="${title}" class="w-full h-full object-cover">
                         <span class="absolute top-2 left-2 bg-red-600 text-white font-extrabold text-sm w-7 h-7 rounded-full flex items-center justify-center shadow-lg">${rank}</span>
@@ -170,7 +204,8 @@ function displayMovies(movies) {
 
         // All Movies Grid Card
         allMoviesContainer.innerHTML += `
-            <div onclick="goToDetail('${movie.id}')" class="bg-gray-900 rounded-xl overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition duration-300 border border-gray-800">
+            <div onclick="goToDetail('${movie.id}')" class="relative bg-gray-900 rounded-xl overflow-hidden shadow-lg cursor-pointer hover:scale-105 transition duration-300 border border-gray-800">
+                ${deleteButtonHTML}
                 <div class="h-60 bg-gray-950">
                     <img src="${img}" alt="${title}" class="w-full h-full object-cover">
                 </div>
@@ -183,12 +218,57 @@ function displayMovies(movies) {
     });
 }
 
-// Redirect to detail page with ID parameter
+// Redirect to Details
 window.goToDetail = function(movieId) {
     window.location.href = `detail.html?id=${movieId}`;
 }
 
-// 8. Search Functionality
+// Delete Movie (Admin Only)
+window.deleteMovie = async function(movieId) {
+    if (confirm("ඔබට මෙම චිත්‍රපටය දත්ත ගබඩාවෙන් මකා දැමීමට අවශ්‍යද?")) {
+        try {
+            await deleteDoc(doc(db, "movies", movieId));
+            alert("චිත්‍රපටය සාර්ථකව මකා දමන ලදී!");
+            fetchMovies();
+        } catch (error) {
+            alert("මකා දැමීමට නොහැක: " + error.message);
+        }
+    }
+};
+
+// 8. Admin Modal UI Handlers
+adminPanelBtn.addEventListener('click', () => adminModal.classList.remove('hidden'));
+closeAdminModal.addEventListener('click', () => adminModal.classList.add('hidden'));
+
+// Add Movie Form Submission
+addMovieForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const newMovie = {
+        title: document.getElementById('mTitle').value.trim(),
+        year: document.getElementById('mYear').value.trim(),
+        category: document.getElementById('mCategory').value.trim(),
+        imageUrl: document.getElementById('mImage').value.trim(),
+        description: document.getElementById('mDesc').value.trim(),
+        cast: document.getElementById('mCast').value.trim(),
+        youtubeUrl: document.getElementById('mYoutube').value.trim(),
+        telegramLink: document.getElementById('mTelegram').value.trim(),
+        isTrending: document.getElementById('mTrending').checked,
+        createdAt: new Date().toISOString()
+    };
+
+    try {
+        await addDoc(collection(db, "movies"), newMovie);
+        alert("චිත්‍රපටය සාර්ථකව එකතු කළා!");
+        addMovieForm.reset();
+        adminModal.classList.add('hidden');
+        fetchMovies();
+    } catch (error) {
+        alert("එකතු කිරීමට නොහැකි විය: " + error.message);
+    }
+});
+
+// 9. Search Logic
 searchBox.addEventListener('input', (e) => {
     const searchText = e.target.value.toLowerCase().trim();
     const filtered = allMoviesData.filter(movie => 
