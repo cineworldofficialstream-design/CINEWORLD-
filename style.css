@@ -9,6 +9,8 @@
 body {
     background-color: #000;
     color: #fff;
+    /* සියලුම තිර වල එකම විදිහට පෙන්වීමට අවම පළලක් ලබා දීම */
+    min-width: 350px; 
 }
 
 /* Home Page Background */
@@ -24,24 +26,25 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 50px;
+    padding: 20px 5%;
 }
 
 .logo {
     color: #E50914; 
-    font-size: 40px;
-    font-weight: 700;
+    font-size: 28px; /* කොම්පියුටරයටත් ෆෝන් එකටත් ගැලපෙන්න ප්‍රමාණය වෙනස් කළා */
+    font-weight: 900;
     text-transform: uppercase;
     letter-spacing: 2px;
 }
 
+/* ඉතා කුඩා Sign In බොත්තම */
 .sign-in-btn {
     background-color: #E50914;
     color: white;
-    padding: 8px 16px;
+    padding: 5px 12px; /* බොත්තම කුඩා කර ඇත */
     border: none;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 13px; /* අකුරු කුඩා කර ඇත */
     cursor: pointer;
     font-weight: bold;
 }
@@ -61,20 +64,20 @@ nav {
 }
 
 .header-content h1 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 900;
     max-width: 800px;
     margin-bottom: 1rem;
 }
 
 .header-content h3 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 400;
     margin-bottom: 1.5rem;
 }
 
 .header-content p {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     margin-bottom: 1rem;
 }
 
@@ -88,7 +91,7 @@ nav {
 
 .email-signup input {
     flex: 1;
-    padding: 15px 20px;
+    padding: 12px 15px;
     font-size: 1rem;
     border: 1px solid #8c8c8c;
     border-radius: 4px 0 0 4px;
@@ -99,9 +102,9 @@ nav {
 .email-signup button {
     background-color: #E50914;
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: bold;
-    padding: 10px 30px;
+    padding: 10px 20px;
     border: none;
     border-radius: 0 4px 4px 0;
     cursor: pointer;
@@ -121,33 +124,33 @@ nav {
 
 .login-container {
     background-color: rgba(0, 0, 0, 0.75);
-    width: 100%;
-    max-width: 450px;
+    width: 90%;
+    max-width: 400px;
     margin: 0 auto;
-    padding: 60px 68px 40px;
+    padding: 40px 40px;
     border-radius: 4px;
     margin-top: 20px;
 }
 
 .login-container h2 {
-    font-size: 32px;
-    margin-bottom: 28px;
+    font-size: 28px;
+    margin-bottom: 25px;
 }
 
 #login-form input {
     width: 100%;
-    padding: 16px 20px;
-    margin-bottom: 16px;
+    padding: 14px 18px;
+    margin-bottom: 15px;
     background-color: #333;
     border: none;
     border-radius: 4px;
     color: white;
-    font-size: 16px;
+    font-size: 15px;
 }
 
 .login-submit-btn {
     width: 100%;
-    padding: 16px;
+    padding: 14px;
     background-color: #E50914;
     color: white;
     border: none;
@@ -155,17 +158,17 @@ nav {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .login-submit-btn:hover {
     background-color: #c90812;
 }
 
-/* Google Button & Divider */
+/* Google Button & Divider (ඊමේල් ලොගින් එකට පහලින්) */
 .divider {
     text-align: center;
-    margin: 20px 0;
+    margin: 15px 0;
     color: #737373;
     font-size: 14px;
 }
@@ -177,7 +180,7 @@ nav {
     color: #333;
     border: none;
     border-radius: 4px;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: bold;
     cursor: pointer;
     display: flex;
@@ -198,38 +201,8 @@ nav {
 .login-help {
     margin-top: 30px;
     color: #737373;
+    font-size: 14px;
 }
 .login-help b {
     color: white;
-}
-
-/* Mobile Responsive */
-@media (max-width: 600px) {
-    nav {
-        padding: 15px 20px;
-    }
-    .logo {
-        font-size: 24px;
-    }
-    .sign-in-btn {
-        padding: 6px 12px;
-        font-size: 14px;
-    }
-    .header-content h1 {
-        font-size: 2rem;
-    }
-    .email-signup {
-        flex-direction: column;
-    }
-    .email-signup input, .email-signup button {
-        border-radius: 4px;
-        width: 100%;
-        margin-bottom: 10px;
-    }
-    .login-container {
-        padding: 40px 20px;
-        margin-top: 0;
-        height: 100vh;
-        border-radius: 0;
-    }
 }
