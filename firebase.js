@@ -1,7 +1,7 @@
 // firebase.js
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth"; // අලුතින් එකතු කළ කොටස
+import { getAuth } from "firebase/auth"; 
 
 const firebaseConfig = {
   apiKey: "AIzaSyBkJNJxyRvvMQrGNBHoRlyW0hDJN2WYl0Q",
@@ -16,6 +16,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-const auth = getAuth(app); // අලුතින් එකතු කළ කොටස
+const auth = getAuth(app); 
 
 export { app, auth };
