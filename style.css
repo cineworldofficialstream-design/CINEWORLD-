@@ -11,7 +11,7 @@ body {
     color: #fff;
 }
 
-/* Home Page Background (ඔයාගේ පින්තූරය මෙතනට දාන්න) */
+/* Home Page Background */
 .main-bg {
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0.9) 20%, rgba(0, 0, 0, 0.4) 100%), url('Gemini_Generated_Image_amn3ewamn3ewamn3.png');
     background-size: cover;
@@ -155,17 +155,81 @@ nav {
     font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    margin-top: 24px;
+    margin-top: 10px;
 }
 
 .login-submit-btn:hover {
     background-color: #c90812;
 }
 
+/* Google Button & Divider */
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #737373;
+    font-size: 14px;
+}
+
+.google-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: white;
+    color: #333;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.google-btn:hover {
+    background-color: #f1f1f1;
+}
+
+.google-btn img {
+    width: 20px;
+    height: 20px;
+}
+
 .login-help {
-    margin-top: 50px;
+    margin-top: 30px;
     color: #737373;
 }
 .login-help b {
     color: white;
-  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 600px) {
+    nav {
+        padding: 15px 20px;
+    }
+    .logo {
+        font-size: 24px;
+    }
+    .sign-in-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+    .header-content h1 {
+        font-size: 2rem;
+    }
+    .email-signup {
+        flex-direction: column;
+    }
+    .email-signup input, .email-signup button {
+        border-radius: 4px;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .login-container {
+        padding: 40px 20px;
+        margin-top: 0;
+        height: 100vh;
+        border-radius: 0;
+    }
+}
